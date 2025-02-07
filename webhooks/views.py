@@ -1,5 +1,7 @@
 import json
 from rest_framework import views, response, status
+from django.conf import settings
+from django.core.mail import send_mail
 from webhooks import models
 from webhooks.messages import outflow_message
 from services.callmebot import CallMeBot
@@ -31,6 +33,15 @@ class WebhookOrderView(views.APIView):
 
         callmebot = CallMeBot()
         callmebot.send_message(message)
+
+        send_mail(
+            subject='Nova Saída',
+            message='',
+            from_email=f'Stock Simplify <{settings.EMAIL_HOST_USER}>',
+            recipient_list=[settings.EMAIL_ADMIN_RECEIVER],
+            html_message='',
+            fail_silently=False,
+        )
 
         return response.Response(
             data=data,
